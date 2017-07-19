@@ -2,6 +2,7 @@ package com.cmad.mongo;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
 import static com.cmad.util.CmadUtils.*;
 
@@ -18,13 +19,36 @@ public class MongoServiceVerticle extends AbstractVerticle {
 
         vertx.eventBus().consumer(USER_GET, message -> {
 
-            client.find(USER_COLLECTION,
+            FindOptions findOptions = new FindOptions();
+            findOptions.setFields(new JsonObject().put("password", 0));
+
+            client.findWithOptions(USER_COLLECTION,
                     new JsonObject().put(USER, message.body().toString()),
-                    res -> {
+                    findOptions, res -> {
                         if (res.succeeded()) {
                             if (res.result().size() != 0) {
                                 System.out
                                         .println("User exist " + res.result());
+                                message.reply(res.result().toString());
+                            } else {
+                                message.reply("");
+                            }
+                        } else {
+                            res.cause().printStackTrace();
+                            message.reply("");
+                        }
+                    });
+        });
+
+        vertx.eventBus().consumer(USER_ALL, message -> {
+
+            FindOptions findOptions = new FindOptions();
+            findOptions.setFields(new JsonObject().put("password", 0));
+
+            client.findWithOptions(USER_COLLECTION, new JsonObject(),
+                    findOptions, res -> {
+                        if (res.succeeded()) {
+                            if (res.result().size() != 0) {
                                 message.reply(res.result().toString());
                             } else {
                                 message.reply("");

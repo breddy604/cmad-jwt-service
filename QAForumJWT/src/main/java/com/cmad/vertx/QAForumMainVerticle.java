@@ -7,6 +7,7 @@ import static com.cmad.util.CmadUtils.USER;
 import static com.cmad.util.CmadUtils.USER_ADD;
 import static com.cmad.util.CmadUtils.USER_GET;
 import static com.cmad.util.CmadUtils.USER_LOGIN;
+import static com.cmad.util.CmadUtils.USER_ALL;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -16,6 +17,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
 
 public class QAForumMainVerticle extends AbstractVerticle {
+
     @Override
     public void start(Future<Void> future) throws Exception {
 
@@ -71,6 +73,16 @@ public class QAForumMainVerticle extends AbstractVerticle {
                         }
                     });
 
+        });
+
+        router.get("/user/").handler(rctx -> {
+
+            vertx.eventBus().send(USER_ALL, "", res -> {
+
+                rctx.response().setStatusCode(200)
+                        .putHeader("Content-Type", "application/json")
+                        .end(res.result().body().toString());
+            });
         });
 
         router.route("/user/ticket/").handler(BodyHandler.create());
