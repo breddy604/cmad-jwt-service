@@ -20,7 +20,8 @@ public class MongoServiceVerticle extends AbstractVerticle {
         vertx.eventBus().consumer(USER_GET, message -> {
 
             FindOptions findOptions = new FindOptions();
-            findOptions.setFields(new JsonObject().put("password", 0));
+            findOptions.setFields(new JsonObject().put("password", 0)
+                    .put("passwordConfirmation", 0).put("errors", 0));
 
             client.findWithOptions(USER_COLLECTION,
                     new JsonObject().put(USER, message.body().toString()),
@@ -43,7 +44,8 @@ public class MongoServiceVerticle extends AbstractVerticle {
         vertx.eventBus().consumer(USER_ALL, message -> {
 
             FindOptions findOptions = new FindOptions();
-            findOptions.setFields(new JsonObject().put("password", 0));
+            findOptions.setFields(new JsonObject().put("password", 0)
+                    .put("passwordConfirmation", 0).put("errors", 0));
 
             client.findWithOptions(USER_COLLECTION, new JsonObject(),
                     findOptions, res -> {
