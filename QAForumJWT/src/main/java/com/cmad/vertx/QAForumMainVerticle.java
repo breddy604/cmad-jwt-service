@@ -5,9 +5,10 @@ import static com.cmad.util.CmadUtils.TICKET_GET;
 import static com.cmad.util.CmadUtils.TICKET_VERIFY;
 import static com.cmad.util.CmadUtils.USER;
 import static com.cmad.util.CmadUtils.USER_ADD;
+import static com.cmad.util.CmadUtils.USER_ALL;
 import static com.cmad.util.CmadUtils.USER_GET;
 import static com.cmad.util.CmadUtils.USER_LOGIN;
-import static com.cmad.util.CmadUtils.USER_ALL;
+import static com.cmad.util.CmadUtils.USER_UPDATE;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.DeploymentOptions;
@@ -74,6 +75,23 @@ public class QAForumMainVerticle extends AbstractVerticle {
                     });
 
         });
+        
+        router.route("/user/:username/").handler(BodyHandler.create());
+        router.put("/user/:username/").handler(rctx -> {
+            vertx.eventBus().send(USER_UPDATE,
+                    rctx.getBodyAsJson().encodePrettily(), res -> {
+
+                        if (res.result().body().toString().equals("-1")) {
+                            rctx.response().setStatusCode(500).end(
+                                    "User with this username already exist");
+                        } else {
+
+                            rctx.response().setStatusCode(204)
+                                    .end();
+                        }
+                    });
+
+        });        
 
         router.get("/user/").handler(rctx -> {
 

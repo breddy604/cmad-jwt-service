@@ -1,10 +1,17 @@
 package com.cmad.mongo;
 
+import static com.cmad.util.CmadUtils.USER;
+import static com.cmad.util.CmadUtils.USER_ADD;
+import static com.cmad.util.CmadUtils.USER_ALL;
+import static com.cmad.util.CmadUtils.USER_COLLECTION;
+import static com.cmad.util.CmadUtils.USER_GET;
+import static com.cmad.util.CmadUtils.USER_LOGIN;
+import static com.cmad.util.CmadUtils.USER_UPDATE;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
-import static com.cmad.util.CmadUtils.*;
 
 public class MongoServiceVerticle extends AbstractVerticle {
 
@@ -78,6 +85,28 @@ public class MongoServiceVerticle extends AbstractVerticle {
                 }
 
             });
+        });
+
+        vertx.eventBus().consumer(USER_UPDATE, message -> {
+
+            System.out
+                    .println("To be Updated User " + message.body().toString());
+
+            JsonObject userObject = new JsonObject(message.body().toString());
+            String username = userObject.getString("username");
+
+            client.findOneAndReplace(USER_COLLECTION,
+                    new JsonObject().put("username", username), userObject,
+                    res -> {
+                        if (res.succeeded()) {
+                            message.reply(userObject.getString(USER));
+                        } else {
+                            res.cause().printStackTrace();
+                            message.reply(-1);
+                        }
+
+                    });
+
         });
 
         vertx.eventBus().consumer(USER_LOGIN, message -> {

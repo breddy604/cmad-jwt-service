@@ -12,6 +12,7 @@ public class CmadUtils {
     public static final String USER = "username";
     public static final String USER_ALL = "all.users";
     public static final String USER_COLLECTION = "user";
+    public static final String USER_UPDATE = "user.update";
     
     public static final String JWT_TOKEN = "jwt-auth-token";
 }
